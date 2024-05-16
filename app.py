@@ -1,39 +1,45 @@
-from openai import OpenAI
 import streamlit as st
+from openai import OpenAI
 
+# Title for the Streamlit app
 st.title("DriveThru Assistant")
 
+# Load OpenAI API key from Streamlit secrets
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
+# Set default model and message history if not already set
 if "openai_model" not in st.session_state:
-    st.session_state["openai_model"] = "gpt-3.5-turbo"
-
+    st.session_state["openai_model"] = "gpt-4o"
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state["messages"] = []
 
-# Microphone Icon (placeholder for now)
-st.markdown(
-    '<i class="fas fa-microphone" style="font-size: 24px; color: grey; margin-right: 10px;"></i>',
-    unsafe_allow_html=True,
-)
+# Display past conversation history
+for message in st.session_state["messages"]:
+    st.chat_message(message["role"], message["content"])
 
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+# Get user input and add it to message history
+user_prompt = st.chat_input("Enter your message here...")
+if user_prompt:
+    st.session_state["messages"].append({"role": "user", "content": user_prompt})
+    st.chat_message("user", user_prompt)
 
-if prompt := st.chat_input("Enter your message here..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    # Generate assistant response using OpenAI API
+    assistant_message = client.chat.completions.create(
+        model=st.session_state["openai_model"],
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a drivethru assistant. Repy to any greetings with 'Hi, welcome to ' + any restaurant name+ 'how can I help you today?'",
+            },
+            *[
+                {**message} for message in st.session_state["messages"]
+            ],  # Unpack messages list
+        ],
+        stream=True,
+    )
 
-    with st.chat_message("assistant"):
-        stream = client.chat.completions.create(
-            model=st.session_state["openai_model"],
-            messages=[
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.messages
-            ],
-            stream=True,
-        )
-        response = st.write_stream(stream)
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    # Display streamlit response and update message history
+    response = st.write_stream(assistant_message)
+    st.session_state["messages"].append(
+        {"role": "assistant", "content": response.choices[0].text}
+    )
