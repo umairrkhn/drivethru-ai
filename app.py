@@ -1,7 +1,7 @@
 from openai import OpenAI
 import streamlit as st
 
-st.title("ChatGPT-like clone")
+st.title("DriveThru Assistant")
 
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
@@ -11,11 +11,17 @@ if "openai_model" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+# Microphone Icon (placeholder for now)
+st.markdown(
+    '<i class="fas fa-microphone" style="font-size: 24px; color: grey; margin-right: 10px;"></i>',
+    unsafe_allow_html=True,
+)
+
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("What is up?"):
+if prompt := st.chat_input("Enter your message here..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
