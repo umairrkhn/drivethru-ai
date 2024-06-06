@@ -7,6 +7,7 @@ from streamlit_float import *
 # Float feature initialization
 float_init()
 
+
 def initialize_session_state():
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -42,7 +43,7 @@ if audio_bytes:
                 st.write(transcript)
             os.remove(webm_file_path)
 
-if st.session_state.messages[-1]["role"] != "assistant":
+if st.session_state.messages[0]["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner("🤔🤔🤔..."):
             final_response = get_answer(st.session_state.messages)
