@@ -9,9 +9,7 @@ float_init()
 
 def initialize_session_state():
     if "messages" not in st.session_state:
-        st.session_state.messages = [
-            {"role": "assistant", "content": "Hi! How may I assist you today?"}
-        ]
+        st.session_state.messages = []
     # if "audio_initialized" not in st.session_state:
     #     st.session_state.audio_initialized = False
 
