@@ -18,7 +18,7 @@ def initialize_session_state():
 
 initialize_session_state()
 
-st.title("OpenAI Conversational Chatbot 🤖")
+st.title("Drive Thru Assistant")
 
 # Create footer container for the microphone
 footer_container = st.container()
@@ -46,7 +46,7 @@ if audio_bytes:
 
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
-        with st.spinner("Thinking🤔..."):
+        with st.spinner("🤔🤔🤔..."):
             final_response = get_answer(st.session_state.messages)
         with st.spinner("Generating audio response..."):
             audio_file = text_to_speech(final_response)
