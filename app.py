@@ -11,8 +11,6 @@ float_init()
 def initialize_session_state():
     if "messages" not in st.session_state:
         st.session_state.messages = []
-    # if "audio_initialized" not in st.session_state:
-    #     st.session_state.audio_initialized = False
 
 
 initialize_session_state()
@@ -23,7 +21,6 @@ st.title("Drive Thru Assistant")
 footer_container = st.container()
 with footer_container:
     audio_bytes = audio_recorder()
-
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
@@ -43,7 +40,7 @@ if audio_bytes:
                 st.write(transcript)
             os.remove(webm_file_path)
 
-if st.session_state.messages[0]["role"] != "assistant":
+if st.session_state.messages and st.session_state.messages[0]["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner("🤔🤔🤔..."):
             final_response = get_answer(st.session_state.messages)
