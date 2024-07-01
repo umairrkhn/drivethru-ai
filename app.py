@@ -81,5 +81,6 @@ if st.session_state.thread_id:
         )
         st.markdown(order_summary)
 
+
 # Float the footer container and provide CSS to target it with
 footer_container.float("bottom: 0rem;")

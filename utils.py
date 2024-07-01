@@ -31,7 +31,7 @@ def run_thread(thread_id):
 
 
 def send_message_to_thread(thread_id, message):
-    response = client.beta.threads.message.create(thread_id=thread_id, content=message)
+    response = client.beta.threads.messages.create(thread_id=thread_id, content=message)
     return response.message.content
 
 
