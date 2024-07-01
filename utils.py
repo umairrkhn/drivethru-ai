@@ -3,7 +3,7 @@ import base64
 import streamlit as st
 
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-assistant = client.beta.assistants.retrieve(st.secrets["ASSISTANT_ID"])
+assistant_id = st.secrets["ASSISTANT_ID"]
 
 
 def get_answer(messages):
@@ -18,9 +18,16 @@ def get_answer(messages):
     return response.choices[0].message.content
 
 
-def create_thread():
-    thread = client.threads.create(assistant_id=st.secrets["ASSISTANT_ID"])
+def create_thread_with_message(messages):
+    thread = client.beta.threads.create(assistant_id=assistant_id, messages=messages)
     return thread.id
+
+
+def run_thread(thread_id):
+    run = client.beta.threads.runs.create(
+        thread_id=thread_id, assistant_id=assistant_id
+    )
+    return run
 
 
 def send_message_to_thread(thread_id, message):

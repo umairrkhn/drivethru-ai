@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 import re
-from utils import get_answer, text_to_speech, autoplay_audio, speech_to_text, create_thread, send_message_to_thread
+from utils import get_answer, text_to_speech, autoplay_audio, speech_to_text, create_thread_with_message, run_thread, send_message_to_thread
 from audio_recorder_streamlit import audio_recorder
 from streamlit_float import *
 
@@ -56,8 +56,10 @@ if st.session_state.messages and st.session_state.messages[0]["role"] != "assist
 
         # Create a new thread or send a message to the existing thread
         if not st.session_state.thread_id:
-            st.session_state.thread_id = create_thread()
-        send_message_to_thread(st.session_state.thread_id, final_response)
+            st.session_state.thread_id = create_thread_with_message(st.session_state.messages)
+            run_thread(st.session_state.thread_id)
+        else:
+            send_message_to_thread(st.session_state.thread_id, final_response)
 
 # Display the updated order table
 if st.session_state.thread_id:
