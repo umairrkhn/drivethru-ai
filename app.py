@@ -1,14 +1,6 @@
 import streamlit as st
 import os
-from utils import (
-    get_answer,
-    text_to_speech,
-    autoplay_audio,
-    speech_to_text,
-    create_thread_with_message,
-    run_thread,
-    send_message_to_thread,
-)
+from utils import get_answer, text_to_speech, autoplay_audio, speech_to_text
 from audio_recorder_streamlit import audio_recorder
 from streamlit_float import *
 
@@ -19,9 +11,6 @@ float_init()
 def initialize_session_state():
     if "messages" not in st.session_state:
         st.session_state.messages = []
-    if "thread_id" not in st.session_state:
-        st.session_state.thread_id = None
-
 
 initialize_session_state()
 
@@ -62,33 +51,6 @@ if st.session_state.messages and st.session_state.messages[0]["role"] != "assist
             {"role": "assistant", "content": final_response}
         )
         os.remove(audio_file)
-
-        # Create a new thread or send a message to the existing thread
-        if not st.session_state.thread_id:
-            st.session_state.thread_id = create_thread_with_message(
-                st.session_state.messages
-            )
-            try:
-                run_thread(st.session_state.thread_id)
-            except Exception as e:
-                st.error(f"Error running thread: {e}")
-        else:
-            try:
-                send_message_to_thread(st.session_state.thread_id, final_response)
-            except Exception as e:
-                st.error(f"Error sending message to thread: {e}")
-
-# Display the updated order table
-if st.session_state.thread_id:
-    with st.spinner("Fetching updated order..."):
-        try:
-            order_summary = send_message_to_thread(
-                st.session_state.thread_id, "Get order summary"
-            )
-            st.markdown(order_summary)
-        except Exception as e:
-            st.error(f"Error fetching order summary: {e}")
-
 
 # Float the footer container and provide CSS to target it with
 footer_container.float("bottom: 0rem;")
