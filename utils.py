@@ -1,4 +1,4 @@
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
 import base64
 import streamlit as st
 
@@ -19,8 +19,29 @@ def get_answer(messages):
 
 
 def create_thread_with_message(messages):
-    thread = client.beta.threads.create(messages=messages)
-    return thread.id
+    if st.session_state.thread_id:
+        # Thread already exists, do not create a new one
+        return st.session_state.thread_id
+    else:
+        try:
+            # Create a new thread with initial messages
+            thread = client.beta.threads.create(messages=messages)
+            st.session_state.thread_id = thread.id
+            return thread.id
+        except OpenAIError as e:
+            st.error(f"OpenAI API Error: {e}")
+            # Handle error, possibly retry or inform the user
+
+
+def send_message_to_thread(thread_id, message):
+    try:
+        response = client.beta.threads.messages.create(
+            thread_id=thread_id, content=message, role="user"
+        )
+        return response.message.content
+    except OpenAIError as e:
+        st.error(f"OpenAI API Error: {e}")
+        # Handle error, possibly retry or inform the user
 
 
 def run_thread(thread_id):
@@ -28,11 +49,6 @@ def run_thread(thread_id):
         thread_id=thread_id, assistant_id=assistant_id
     )
     return run
-
-
-def send_message_to_thread(thread_id, message):
-    response = client.beta.threads.messages.create(thread_id=thread_id, content=message, role="user")
-    return response.message.content
 
 
 def speech_to_text(audio_data):

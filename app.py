@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-import re
 from utils import (
     get_answer,
     text_to_speech,
@@ -69,17 +68,26 @@ if st.session_state.messages and st.session_state.messages[0]["role"] != "assist
             st.session_state.thread_id = create_thread_with_message(
                 st.session_state.messages
             )
-            run_thread(st.session_state.thread_id)
+            try:
+                run_thread(st.session_state.thread_id)
+            except Exception as e:
+                st.error(f"Error running thread: {e}")
         else:
-            send_message_to_thread(st.session_state.thread_id, final_response)
+            try:
+                send_message_to_thread(st.session_state.thread_id, final_response)
+            except Exception as e:
+                st.error(f"Error sending message to thread: {e}")
 
 # Display the updated order table
 if st.session_state.thread_id:
     with st.spinner("Fetching updated order..."):
-        order_summary = send_message_to_thread(
-            st.session_state.thread_id, "Get order summary"
-        )
-        st.markdown(order_summary)
+        try:
+            order_summary = send_message_to_thread(
+                st.session_state.thread_id, "Get order summary"
+            )
+            st.markdown(order_summary)
+        except Exception as e:
+            st.error(f"Error fetching order summary: {e}")
 
 
 # Float the footer container and provide CSS to target it with
