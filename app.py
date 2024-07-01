@@ -1,17 +1,18 @@
 import streamlit as st
 import os
-from utils import get_answer, text_to_speech, autoplay_audio, speech_to_text
+import re
+from utils import get_answer, text_to_speech, autoplay_audio, speech_to_text, create_thread, send_message_to_thread
 from audio_recorder_streamlit import audio_recorder
 from streamlit_float import *
 
 # Float feature initialization
 float_init()
 
-
 def initialize_session_state():
     if "messages" not in st.session_state:
         st.session_state.messages = []
-
+    if "thread_id" not in st.session_state:
+        st.session_state.thread_id = None
 
 initialize_session_state()
 
@@ -52,6 +53,17 @@ if st.session_state.messages and st.session_state.messages[0]["role"] != "assist
             {"role": "assistant", "content": final_response}
         )
         os.remove(audio_file)
+
+        # Create a new thread or send a message to the existing thread
+        if not st.session_state.thread_id:
+            st.session_state.thread_id = create_thread()
+        send_message_to_thread(st.session_state.thread_id, final_response)
+
+# Display the updated order table
+if st.session_state.thread_id:
+    with st.spinner("Fetching updated order..."):
+        order_summary = send_message_to_thread(st.session_state.thread_id, "Get order summary")
+        st.markdown(order_summary)
 
 # Float the footer container and provide CSS to target it with
 footer_container.float("bottom: 0rem;")
