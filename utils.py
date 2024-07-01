@@ -19,14 +19,12 @@ def get_answer(messages):
 
 
 def create_thread_with_message(messages):
-    thread = client.beta.threads.create(assistant_id=assistant_id, messages=messages)
+    thread = client.beta.threads.create(messages=messages)
     return thread.id
 
 
 def run_thread(thread_id):
-    run = client.beta.threads.runs.create(
-        thread_id=thread_id, assistant_id=assistant_id
-    )
+    run = client.beta.threads.runs.create(thread_id=thread_id)
     return run
 
 
