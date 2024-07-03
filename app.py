@@ -10,6 +10,25 @@ from openai.types.beta.threads.text_delta_block import TextDeltaBlock
 # Float feature initialization
 float_init()
 
+# Define a layout hack
+st.markdown(
+    """
+    <style>
+    .reportview-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .block-container {
+        width: 70%;
+    }
+    .sidebar .sidebar-content {
+        width: 50%;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 def initialize_session_state():
     if "messages" not in st.session_state:
@@ -26,10 +45,7 @@ assistant = client.beta.assistants.retrieve(assistant_id=st.secrets["ASSISTANT_I
 if "thread_id" not in st.session_state:
     st.session_state.thread_id = client.beta.threads.create().id
 
-# Adding a new container for the assistant's recent message
-assistant_msg_container = st.container()
-
-# Create footer container for the microphone
+# Footer container for the microphone
 footer_container = st.container()
 with footer_container:
     audio_bytes = audio_recorder()
@@ -52,7 +68,7 @@ if audio_bytes:
                 st.write(transcript)
             os.remove(webm_file_path)
 
-if st.session_state.messages and st.session_state.messages[0]["role"] != "assistant":
+if st.session_state.messages and st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner("🤔🤔🤔..."):
             final_response = get_answer(st.session_state.messages)
@@ -91,11 +107,10 @@ if st.session_state.messages and st.session_state.messages[0]["role"] != "assist
         )
         os.remove(audio_file)
 
-    # Add assistant's recent response under 'Order'
+    # Display assistant's recent response in the sidebar as 'Order'
     if assistant_reply:
-        with assistant_msg_container:
-            st.subheader("Order")
-            st.text(assistant_reply)
+        st.sidebar.subheader("Order")
+        st.sidebar.text(assistant_reply)
 
 # Float the footer container and provide CSS to target it with
 footer_container.float("bottom: 0rem;")
