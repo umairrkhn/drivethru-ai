@@ -22,7 +22,7 @@ st.markdown(
         width: 70%;
     }
     .sidebar .sidebar-content {
-        width: 50%;
+        width: 30%;
     }
     </style>
     """,
@@ -110,6 +110,7 @@ if st.session_state.messages and st.session_state.messages[-1]["role"] != "assis
     # Display assistant's recent response in the sidebar as 'Order'
     if assistant_reply:
         st.sidebar.subheader("Order")
+        print(assistant_reply)
         st.sidebar.text(assistant_reply)
 
 # Float the footer container and provide CSS to target it with
