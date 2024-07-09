@@ -33,6 +33,8 @@ st.markdown(
 def initialize_session_state():
     if "messages" not in st.session_state:
         st.session_state.messages = []
+    if "order_status" not in st.session_state:
+        st.session_state.order_status = ""
 
 
 initialize_session_state()
@@ -65,6 +67,29 @@ if audio_bytes:
                 st.write(transcript)
             os.remove(audio_file_path)
 
+            # Send input to the assistant
+            client.beta.threads.messages.create(
+                thread_id=st.session_state.thread_id, role="user", content=transcript
+            )
+            run = client.beta.threads.runs.create(
+                thread_id=st.session_state.thread_id, assistant_id=assistant.id
+            )
+
+            # Wait for the assistant's response
+            while run.status != "completed":
+                run = client.beta.threads.runs.retrieve(
+                    thread_id=st.session_state.thread_id, run_id=run.id
+                )
+
+            # Get the assistant's response
+            messages = client.beta.threads.messages.list(
+                thread_id=st.session_state.thread_id
+            )
+            assistant_response = messages.data[0].content[0].text.value
+
+            # Update order status in the sidebar
+            st.session_state.order_status = assistant_response
+
 if st.session_state.messages and st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner("🤔🤔🤔..."):
@@ -79,8 +104,8 @@ if st.session_state.messages and st.session_state.messages[-1]["role"] != "assis
             utils.autoplay_audio(audio_file)
             os.remove(audio_file)
 
-st.sidebar.subheader("Order")
-if st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
-    st.sidebar.text(st.session_state.messages[-1]["content"])
+# Update sidebar with order status
+st.sidebar.subheader("Order Status")
+st.sidebar.text(st.session_state.order_status)
 
 footer_container.float("bottom: 0rem;")
