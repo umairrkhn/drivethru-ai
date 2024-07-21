@@ -1,3 +1,4 @@
+import re
 from openai import OpenAI
 import streamlit as st
 import utils
@@ -60,5 +61,10 @@ if prompt := st.chat_input("What would you like to order?"):
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 # Update sidebar with order status
-st.sidebar.subheader("Order Status")
-st.sidebar.text(st.session_state.order_status)
+pattern = r'【\d+†source】'
+if st.session_state.order_status:
+    order_status = st.session_state.order_status
+    order_status = re.sub(pattern, "", order_status)
+    st.sidebar.subheader("Order Status")
+    st.sidebar.text(order_status)
+    
