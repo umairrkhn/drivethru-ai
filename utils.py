@@ -6,7 +6,7 @@ client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 assistant = client.beta.assistants.retrieve(st.secrets["ASSISTANT_ID"])
 
 prompt = """
-        As an AI assistant working in a drive-thru at Max Burgers, your primary responsibility is to assist customers with their orders. Keep your responses as short as possible.
+As an AI assistant working in a drive-thru at Max Burgers, your primary responsibility is to assist customers with their orders. Keep your responses as short as possible.
           
           If the user input is in Swedish make sure to have the entire conversation in Swedish otherwise English. Do not use any other language. Keep your response short and to the point.
 
@@ -50,7 +50,8 @@ prompt = """
             - "Sure! What drink would you like with your meal?"
             - "Would you like anything else?"
             - "Please move to the next window." 
-      '''
+    
+    """
     
 def get_answer(messages):
     system_message = [
